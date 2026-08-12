@@ -52,17 +52,21 @@
             margin-top: 0;
             margin-bottom: 12px;
             font-weight: 600;
+            background-color: #f7fafc;
+            padding: 8px 12px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
         }
 
         section {
-            margin-bottom: 16px;
+            margin-bottom: 24px;
             text-align: left;
         }
 
         hr {
             border: none;
-            border-top: 1px solid #e2e8f0;
-            margin: 16px 0;
+            border-top: 1px dashed #cbd5e0;
+            margin: 20px 0;
         }
 
         label {
@@ -70,7 +74,7 @@
             color: #4a5568;
             font-size: 14px;
             margin-bottom: 6px;
-            font-weight: 400;
+            font-weight: 500;
         }
 
         .form-group {
@@ -79,7 +83,7 @@
 
         input[type="text"],
         input[type="number"],
-        input[type="name"],
+        input[type="date"],
         select,
         textarea {
             width: 100%;
@@ -95,6 +99,7 @@
 
         input[type="text"]:focus,
         input[type="number"]:focus,
+        input[type="date"]:focus,
         select:focus,
         textarea:focus {
             border-color: #667eea;
@@ -131,6 +136,16 @@
             font-size: 14px;
             color: #2d3748;
             line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .sub-group {
+            margin-left: 28px;
+            padding: 8px;
+            background-color: #f7fafc;
+            border-radius: 8px;
+            margin-top: 4px;
+            margin-bottom: 8px;
         }
 
         p {
@@ -198,6 +213,8 @@
             transform: scale(0.8);
             transition: transform 0.3s ease;
             text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-overlay.active .modal-box {
@@ -284,14 +301,27 @@
     <div class="card">
         <h1>แบบคัดกรองอาการเจ็บคอเบื้องต้น</h1>
 
+        <!-- ส่วนที่ 0: ความยินยอม -->
+        <section>
+            <h2>ข้อตกลงและยินยอม (PDPA)</h2>
+            <p>ยินยอมให้เก็บข้อมูลส่วนบุคคล การประเมินเบื้องต้น และประวัติการรักษา เพื่อใช้ประกอบการพิจารณาจ่ายยา</p>
+            <div class="option-group">
+                <input type="radio" name="pdpa" id="pdpa-yes" value="ยินยอม" checked>
+                <label for="pdpa-yes">ข้าพเจ้ายินยอม</label>
+            </div>
+            <div class="option-group">
+                <input type="radio" name="pdpa" id="pdpa-no" value="ไม่ยินยอม">
+                <label for="pdpa-no">ไม่ยินยอม</label>
+            </div>
+        </section>
+
         <!-- ส่วนที่ 1: ลงทะเบียนเบื้องต้น -->
         <section>
-            <h2>1. ข้อมูลทั่วไป</h2>
+            <h2>1. ข้อมูลทั่วไปของผู้ป่วย</h2>
             <div class="grid-2col">
-                <div class="form-group">
-                    <label for="name">ชื่อ นามสกุล:</label>
-                    <input type="name" id="name" placeholder="เช่น นายสมชาย ใจดี">
-
+                <div class="form-group full-width">
+                    <label for="name">ชื่อ-นามสกุล:</label>
+                    <input type="text" id="name" placeholder="เช่น นายสมชาย ใจดี">
                 </div>
                 <div class="form-group">
                     <label for="patient-age">อายุ (ปี):</label>
@@ -300,9 +330,8 @@
                 <div class="form-group">
                     <label for="patient-gender">เพศ:</label>
                     <select id="patient-gender">
-                        <option value="male">ชาย</option>
-                        <option value="female">หญิง</option>
-                        <!-- <option value="other">อื่นๆ</option> -->
+                        <option value="ชาย">ชาย</option>
+                        <option value="หญิง">หญิง</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -310,29 +339,99 @@
                     <input type="number" id="patient-weight" placeholder="เช่น 55.5">
                 </div>
                 <div class="form-group">
-                    <label for="patient-comorbidity">โรคประจำตัว:</label>
-                    <input type="text" id="patient-comorbidity" placeholder="เช่น ความดัน (ถ้าไม่มีใส่ -)">
+                    <label for="patient-height">ส่วนสูง (ซม.):</label>
+                    <input type="number" id="patient-height" placeholder="เช่น 165">
                 </div>
                 <div class="form-group full-width">
-                    <label for="patient-main-symptom">อาการสำคัญ:</label>
-                    <textarea id="patient-main-symptom" rows="3" placeholder="เช่น เจ็บคอมา 2 วัน มีไข้"></textarea>
+                    <label for="patient-comorbidity">โรคประจำตัว / ยาที่ทานประจำ:</label>
+                    <input type="text" id="patient-comorbidity" placeholder="เช่น ความดัน, เบาหวาน (ถ้าไม่มีใส่ -)">
+                </div>
+                <div class="form-group full-width">
+                    <label for="patient-allergy">ประวัติแพ้ยา:</label>
+                    <input type="text" id="patient-allergy" placeholder="เช่น แพ้ยาเพนนิซิลลิน (ถ้าไม่มีใส่ -)">
                 </div>
             </div>
         </section>
 
-        <hr>
-
-        <!-- ส่วนที่ 2: Visual Throat Screening -->
+        <!-- ส่วนที่ 2: ผลตรวจ ATK -->
         <section>
-            <h2>2. ลักษณะคอ (Visual Throat Screening)</h2>
+            <h2>2. ผลการตรวจ ATK (ถ้ามี)</h2>
+            <div class="form-group">
+                <label for="atk-date">วันที่ตรวจ ATK:</label>
+                <input type="date" id="atk-date">
+            </div>
+            <div class="grid-2col">
+                <div class="option-group"><input type="checkbox" id="atk-covid" value="COVID"><label for="atk-covid">COVID (ติดเชื้อ)</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-flu-a" value="Flu A"><label for="atk-flu-a">ไข้หวัดใหญ่ Flu A</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-flu-b" value="Flu B"><label for="atk-flu-b">ไข้หวัดใหญ่ Flu B</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-rsv" value="RSV"><label for="atk-rsv">RSV</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-hmpv" value="hMPV"><label for="atk-hmpv">hMPV</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-negative" value="ไม่พบเชื้อ"><label for="atk-negative">ไม่พบเชื้อ (Negative)</label></div>
+            </div>
+        </section>
+
+        <!-- ส่วนที่ 3: เช็กลิสต์อาการที่เป็น (Symptom Checklists) -->
+        <section>
+            <h2>3. อาการที่เป็นในวันนี้</h2>
+            
+            <label>1. อาการไข้</label>
+            <div class="option-group"><input type="radio" name="fever" id="fever-no" value="ไม่มีไข้" checked><label for="fever-no">ไม่มีไข้</label></div>
+            <div class="option-group"><input type="radio" name="fever" id="fever-yes" value="มีไข้"><label for="fever-yes">มีไข้ (สูงกว่า 38°C)</label></div>
+
+            <label style="margin-top: 10px;">2. อาการไอ</label>
+            <div class="option-group"><input type="radio" name="cough" id="cough-no" value="ไม่มี" checked><label for="cough-no">ไม่มีอาการไอ</label></div>
+            <div class="option-group"><input type="radio" name="cough" id="cough-yes" value="มี"><label for="cough-yes">มีอาการไอ</label></div>
+            <div class="sub-group">
+                <label>ลักษณะการไอ:</label>
+                <div class="option-group"><input type="radio" name="cough-type" value="ไอแห้ง"><label>ไอแห้ง</label></div>
+                <div class="option-group"><input type="radio" name="cough-type" value="ไอมีเสมหะ"><label>ไอมีเสมหะ</label></div>
+                <div class="option-group"><input type="radio" name="cough-type" value="ไอกรน"><label>ไอกรน</label></div>
+            </div>
+
+            <label style="margin-top: 10px;">3. น้ำมูก / เสมหะ</label>
+            <div class="grid-2col">
+                <div>
+                    <label>ลักษณะน้ำมูก:</label>
+                    <div class="option-group"><input type="radio" name="runny-nose" value="ไม่มี" checked><label>ไม่มีน้ำมูก</label></div>
+                    <div class="option-group"><input type="radio" name="runny-nose" value="ใส"><label>น้ำมูกใส</label></div>
+                    <div class="option-group"><input type="radio" name="runny-nose" value="ขุ่น"><label>น้ำมูกขุ่น</label></div>
+                    <div class="option-group"><input type="radio" name="runny-nose" value="ไหลลงคอ"><label>ไหลลงคอ</label></div>
+                </div>
+                <div>
+                    <label>ลักษณะเสมหะ:</label>
+                    <div class="option-group"><input type="radio" name="phlegm" value="ไม่มีเสมหะ" checked><label>ไม่มีเสมหะ</label></div>
+                    <div class="option-group"><input type="radio" name="phlegm" value="ใส"><label>ใส</label></div>
+                    <div class="option-group"><input type="radio" name="phlegm" value="เขียว"><label>เขียว</label></div>
+                    <div class="option-group"><input type="radio" name="phlegm" value="เหลืองขุ่น"><label>เหลืองขุ่น</label></div>
+                </div>
+            </div>
+
+            <label style="margin-top: 10px;">4. การกลืนอาหาร/น้ำดื่ม</label>
+            <div class="option-group"><input type="radio" name="swallow" value="กลืนได้ปกติ" checked><label>กลืนได้ปกติ</label></div>
+            <div class="option-group"><input type="radio" name="swallow" value="กลืนได้ลำบาก/ลดลง"><label>กลืนได้ลำบาก / ลดลง</label></div>
+            <div class="option-group"><input type="radio" name="swallow" value="กลืนไม่ได้/สำลัก"><label>กลืนไม่ได้เลย / สำลัก</label></div>
+
+            <label style="margin-top: 10px;">5. อาการอื่นๆ ร่วมด้วย (เลือกได้มากกว่า 1)</label>
+            <div class="grid-2col">
+                <div class="option-group"><input type="checkbox" id="symp-eye"><label for="symp-eye">ตาแดง</label></div>
+                <div class="option-group"><input type="checkbox" id="symp-rash"><label for="symp-rash">ผื่น</label></div>
+                <div class="option-group"><input type="checkbox" id="symp-diarrhea"><label for="symp-diarrhea">ถ่ายเหลว</label></div>
+                <div class="option-group"><input type="checkbox" id="symp-muscle"><label for="symp-muscle">ปวดกล้ามเนื้อ</label></div>
+                <div class="option-group"><input type="checkbox" id="symp-mouth"><label for="symp-mouth">ปากเปื่อย/มีแผล</label></div>
+                <div class="option-group"><input type="checkbox" id="symp-nodes"><label for="symp-nodes">ต่อมน้ำเหลืองใต้ขากรรไกรกดเจ็บ</label></div>
+            </div>
+        </section>
+
+        <!-- ส่วนที่ 4: Visual Throat Screening -->
+        <section>
+            <h2>4. ลักษณะคอ (Visual Throat Screening)</h2>
             <p>โปรดส่องกระจกและเลือกภาพลักษณะคอที่ตรงกับของคุณมากที่สุด:</p>
             <div class="grid-2col">
-                <div class="option-group"><input type="radio" name="throat" id="t1" value="normal"><label for="t1">คอปกติ</label></div>
-                <div class="option-group"><input type="radio" name="throat" id="t2" value="mild_red"><label for="t2">คอแดงเล็กน้อย</label></div>
-                <div class="option-group"><input type="radio" name="throat" id="t3" value="red_white_spots"><label for="t3">คอแดงมีจุดขาว</label></div>
-                <div class="option-group"><input type="radio" name="throat" id="t4" value="tonsils_enlarged"><label for="t4">ต่อมทอนซิลโต</label></div>
-                <div class="option-group"><input type="radio" name="throat" id="t5" value="pus"><label for="t5">มีหนอง</label></div>
-                <div class="option-group"><input type="radio" name="throat" id="t6" value="difficulty_swallowing"><label for="t6">กลืนลำบาก</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t1" value="คอปกติ" checked><label for="t1">คอปกติ</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t2" value="คอแดงเล็กน้อย"><label for="t2">คอแดงเล็กน้อย</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t3" value="คอแดงมีจุดขาว"><label for="t3">คอแดงมีจุดขาว</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t4" value="ต่อมทอนซิลโต"><label for="t4">ต่อมทอนซิลโต</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t5" value="มีหนอง"><label for="t5">มีหนอง</label></div>
             </div>
             <div style="margin-top: 12px;">
                 <label for="throat-image-upload">หรืออัปโหลดรูปถ่ายคอของคุณ (ถ้ามี):</label>
@@ -340,36 +439,9 @@
             </div>
         </section>
 
-        <hr>
-
-        <!-- ส่วนที่ 3: McIsaac Score Checklist -->
-        <section>
-            <h2>3. แบบประเมินอาการเพิ่มเติม (McIsaac)</h2>
-            <div class="option-group"><input type="checkbox" id="mc-fever"><label for="mc-fever">มีไข้มากกว่า 38°C</label></div>
-            <div class="option-group"><input type="checkbox" id="mc-no-cough"><label for="mc-no-cough">ไม่มีอาการไอ</label></div>
-            <div class="option-group"><input type="checkbox" id="mc-tender-nodes"><label for="mc-tender-nodes">ต่อมน้ำเหลืองใต้ขากรรไกรกดเจ็บ</label></div>
-            <div class="option-group"><input type="checkbox" id="mc-exudate"><label for="mc-exudate">มีจุดหนองหรือแผ่นขาวที่ทอนซิล (Tonsillar exudate)</label></div>
-        </section>
-
-        <hr>
-
-        <!-- ส่วนที่ 4: Viral Screening (ATK) -->
-        <section>
-            <h2>4. ผลการตรวจ ATK (ถ้ามี)</h2>
-            <div class="grid-2col">
-                <div class="option-group"><input type="checkbox" id="atk-covid"><label for="atk-covid">COVID (ติดเชื้อ)</label></div>
-                <div class="option-group"><input type="checkbox" id="atk-flu-a"><label for="atk-flu-a">ไข้หวัดใหญ่ Flu A (ติดเชื้อ)</label></div>
-                <div class="option-group"><input type="checkbox" id="atk-flu-b"><label for="atk-flu-b">ไข้หวัดใหญ่ Flu B (ติดเชื้อ)</label></div>
-                <div class="option-group"><input type="checkbox" id="atk-negative"><label for="atk-negative">ไม่พบเชื้อ (Negative ทั้งหมด)</label></div>
-            </div>
-        </section>
-
-        <hr>
-
         <!-- ส่วนที่ 5: Andrographis Checklist -->
         <section>
-            <h2>5. เช็กลิสต์ความปลอดภัยก่อนใช้ยาฟ้าทะลายโจร</h2>
-            <div class="option-group"><input type="checkbox" id="andro-age"><label for="andro-age">อายุ 12 ปีขึ้นไป</label></div>
+            <h2>5. เช็กลิสต์ความปลอดภัย (ก่อนใช้ยาฟ้าทะลายโจร)</h2>
             <div class="option-group"><input type="checkbox" id="andro-pregnant"><label for="andro-pregnant">กำลังตั้งครรภ์ หรือ ให้นมบุตร</label></div>
             <div class="option-group"><input type="checkbox" id="andro-allergy"><label for="andro-allergy">เคยมีประวัติแพ้ฟ้าทะลายโจร</label></div>
             <div class="option-group"><input type="checkbox" id="andro-organ"><label for="andro-organ">มีโรคตับ หรือ โรคไตรุนแรง</label></div>
@@ -378,7 +450,7 @@
             <div class="option-group"><input type="checkbox" id="andro-interaction"><label for="andro-interaction">กำลังใช้ยาความดัน หรือ ยาอื่นที่มีปฏิกิริยาร่วม</label></div>
         </section>
 
-        <button type="button" class="btn-submit" onclick="submitData()">ส่งข้อมูลให้เภสัชกร</button>
+        <button type="button" class="btn-submit" onclick="submitData()">ประเมินอาการและส่งข้อมูล</button>
     </div>
 
     <!-- Structure ของ Modal Popup -->
@@ -394,6 +466,13 @@
 
     <script>
         function submitData() {
+            // เช็กการยินยอม PDPA
+            const isConsent = document.getElementById('pdpa-yes').checked;
+            if (!isConsent) {
+                alert('กรุณากดยินยอมให้เก็บข้อมูลเพื่อดำเนินการต่อ');
+                return;
+            }
+
             const ageInput = document.getElementById('patient-age').value;
             const age = parseInt(ageInput);
 
@@ -402,20 +481,21 @@
                 return;
             }
 
-            const isFever = document.getElementById('mc-fever').checked;
-            const isNoCough = document.getElementById('mc-no-cough').checked;
-            const isTenderNodes = document.getElementById('mc-tender-nodes').checked;
-            const isExudate = document.getElementById('mc-exudate').checked;
-
+            // คำนวณ McIsaac Score แบบอัตโนมัติจาก Checklists ที่คนไข้เลือก
+            const isFever = document.getElementById('fever-yes').checked;
+            const isNoCough = document.getElementById('cough-no').checked;
+            const isTenderNodes = document.getElementById('symp-nodes').checked;
+            
             const selectedThroat = document.querySelector('input[name="throat"]:checked')?.value;
-            const isThroatPusOrSpot = (selectedThroat === 'red_white_spots' || selectedThroat === 'pus');
+            const isExudate = (selectedThroat === 'คอแดงมีจุดขาว' || selectedThroat === 'มีหนอง');
 
             let score = 0;
-            if (isFever) score += 1;
-            if (isNoCough) score += 1;
-            if (isTenderNodes) score += 1;
-            if (isExudate || isThroatPusOrSpot) score += 1;
+            if (isFever) score += 1; // มีไข้ > 38
+            if (isNoCough) score += 1; // ไม่มีอาการไอ
+            if (isTenderNodes) score += 1; // ต่อมน้ำเหลืองโต/กดเจ็บ
+            if (isExudate) score += 1; // ทอนซิลมีจุดหนองหรือแผ่นขาว
 
+            // ปรับคะแนนตามอายุ
             if (age >= 3 && age <= 14) {
                 score += 1;
             } else if (age >= 45) {
@@ -424,12 +504,13 @@
 
             if (score < 0) score = 0;
 
+            // ประมวลผลข้อความเพื่อแสดงใน Modal
             let title = "";
             let bodyHTML = "";
 
             if (score <= 1) {
                 title = "ความเสี่ยงติดเชื้อแบคทีเรียต่ำ (< 10%)";
-                bodyHTML = "• โอกาสติดเชื้อไวรัสสูง แนะนำการรักษาตามอาการ เช่น จิบน้ิำอุ่น พักผ่อนให้เพียงพอ<br>• อาจพิจารณาใช้ยาฟ้าทะลายโจร (หากไม่มีข้อห้ามใช้)";
+                bodyHTML = "• โอกาสติดเชื้อไวรัสสูง แนะนำการรักษาตามอาการ เช่น จิบน้ำอุ่น พักผ่อนให้เพียงพอ<br>• อาจพิจารณาใช้ยาฟ้าทะลายโจร (หากไม่มีข้อห้ามใช้)";
             } else if (score === 2 || score === 3) {
                 title = "ความเสี่ยงติดเชื้อแบคทีเรียปานกลาง (15 - 32%)";
                 bodyHTML = "• แนะนำให้ส่งข้อมูลตรวจเพิ่มเติม หรือปรึกษาเภสัชกร/แพทย์ก่อนใช้ยาปฏิชีวนะ (ยาฆ่าเชื้อ)<br>• ตรวจสอบผล ATK ร่วมด้วยเพื่อตัดสาเหตุจาก COVID-19 / ไข้หวัดใหญ่";
@@ -453,13 +534,13 @@
                 warningElement.style.display = "none";
             }
 
-            // ใส่ข้อมูลลง Modal
+            // แสดงผล Modal
             document.getElementById('modalScore').innerText = `คะแนน McIsaac Score: ${score} คะแนน`;
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalBody').innerHTML = bodyHTML;
-
-            // แสดง Modal
             document.getElementById('resultModal').classList.add('active');
+            
+            // หมายเหตุ: โค้ดส่วนนี้พร้อมสำหรับการรวบรวมเป็น JSON Payload เพื่อส่ง Backend แล้ว
         }
 
         function closeModal() {
