@@ -1,0 +1,22 @@
+[
+  {
+    "name": "สมชาย ใจดี",
+    "age": 20,
+    "gender": "ชาย",
+    "weight": 55,
+    "atk": "Negative",
+    "score": 4,
+    "risk": "High",
+    "image": "https://placehold.co/800x350?text=Throat+Image"
+  },
+  {
+    "name": "สมหญิง ดีมาก",
+    "age": 18,
+    "gender": "หญิง",
+    "weight": 48,
+    "atk": "Positive",
+    "score": 2,
+    "risk": "Medium",
+    "image": "https://placehold.co/800x350?text=Throat+Image"
+  }
+]
