@@ -1,13 +1,470 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>pharmacist-dashboard</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบคัดกรองอาการเจ็บคอเบื้องต้น</title>
+    
+    <!-- ดึงฟอนต์ Kanit จาก Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 1. Mobile Default */
+        .card {
+            background-color: #ffffff;
+            padding: 20px 16px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        h2 {
+            color: #4a5568;
+            font-size: 16px;
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        section {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 16px 0;
+        }
+
+        label {
+            display: inline-block;
+            color: #4a5568;
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 400;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="name"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 14px;
+            color: #2d3748;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        input[type="file"] {
+            font-size: 13px;
+            color: #4a5568;
+            margin-top: 4px;
+            width: 100%;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            cursor: pointer;
+        }
+
+        .option-group input[type="radio"],
+        .option-group input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #667eea;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+            font-size: 14px;
+            color: #2d3748;
+            line-height: 1.4;
+        }
+
+        p {
+            color: #718096;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: #667eea;
+            color: #ffffff;
+            padding: 14px;
+            border: none;
+            border-radius: 30px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        /* -------------------------------------------------------------
+           Style สำหรับ Modal Popup
+           ------------------------------------------------------------- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 28px 24px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .score-badge {
+            display: inline-block;
+            background: #ebf8ff;
+            color: #2b6cb0;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+        }
+
+        .modal-body {
+            font-size: 14px;
+            color: #4a5568;
+            text-align: left;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            background: #f7fafc;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .warning-box {
+            background: #fff5f5;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 13px;
+            text-align: left;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .btn-close {
+            background: #667eea;
+            color: #ffffff;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 20px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-close:hover {
+            background: #5a67d8;
+        }
+
+        /* Responsive Breakpoints */
+        @media (min-width: 600px) {
+            body { padding: 24px; }
+            .card { padding: 32px 28px; max-width: 580px; }
+            h1 { font-size: 22px; }
+            .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+            .full-width { grid-column: span 2; }
+        }
+
+        @media (min-width: 900px) {
+            body { padding: 40px; }
+            .card { padding: 40px 36px; max-width: 680px; }
+            h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>แบบคัดกรองอาการเจ็บคอเบื้องต้น</h1>
+
+        <!-- ส่วนที่ 1: ลงทะเบียนเบื้องต้น -->
+        <section>
+            <h2>1. ข้อมูลทั่วไป</h2>
+            <div class="grid-2col">
+                <div class="form-group">
+                    <label for="name">ชื่อ นามสกุล:</label>
+                    <input type="name" id="name" placeholder="เช่น นายสมชาย ใจดี">
+
+                </div>
+                <div class="form-group">
+                    <label for="patient-age">อายุ (ปี):</label>
+                    <input type="number" id="patient-age" placeholder="เช่น 25">
+                </div>
+                <div class="form-group">
+                    <label for="patient-gender">เพศ:</label>
+                    <select id="patient-gender">
+                        <option value="male">ชาย</option>
+                        <option value="female">หญิง</option>
+                        <!-- <option value="other">อื่นๆ</option> -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="patient-weight">น้ำหนัก (กก.):</label>
+                    <input type="number" id="patient-weight" placeholder="เช่น 55.5">
+                </div>
+                <div class="form-group">
+                    <label for="patient-comorbidity">โรคประจำตัว:</label>
+                    <input type="text" id="patient-comorbidity" placeholder="เช่น ความดัน (ถ้าไม่มีใส่ -)">
+                </div>
+                <div class="form-group full-width">
+                    <label for="patient-main-symptom">อาการสำคัญ:</label>
+                    <textarea id="patient-main-symptom" rows="3" placeholder="เช่น เจ็บคอมา 2 วัน มีไข้"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- ส่วนที่ 2: Visual Throat Screening -->
+        <section>
+            <h2>2. ลักษณะคอ (Visual Throat Screening)</h2>
+            <p>โปรดส่องกระจกและเลือกภาพลักษณะคอที่ตรงกับของคุณมากที่สุด:</p>
+            <div class="grid-2col">
+                <div class="option-group"><input type="radio" name="throat" id="t1" value="normal"><label for="t1">คอปกติ</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t2" value="mild_red"><label for="t2">คอแดงเล็กน้อย</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t3" value="red_white_spots"><label for="t3">คอแดงมีจุดขาว</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t4" value="tonsils_enlarged"><label for="t4">ต่อมทอนซิลโต</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t5" value="pus"><label for="t5">มีหนอง</label></div>
+                <div class="option-group"><input type="radio" name="throat" id="t6" value="difficulty_swallowing"><label for="t6">กลืนลำบาก</label></div>
+            </div>
+            <div style="margin-top: 12px;">
+                <label for="throat-image-upload">หรืออัปโหลดรูปถ่ายคอของคุณ (ถ้ามี):</label>
+                <input type="file" id="throat-image-upload" accept="image/*">
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- ส่วนที่ 3: McIsaac Score Checklist -->
+        <section>
+            <h2>3. แบบประเมินอาการเพิ่มเติม (McIsaac)</h2>
+            <div class="option-group"><input type="checkbox" id="mc-fever"><label for="mc-fever">มีไข้มากกว่า 38°C</label></div>
+            <div class="option-group"><input type="checkbox" id="mc-no-cough"><label for="mc-no-cough">ไม่มีอาการไอ</label></div>
+            <div class="option-group"><input type="checkbox" id="mc-tender-nodes"><label for="mc-tender-nodes">ต่อมน้ำเหลืองใต้ขากรรไกรกดเจ็บ</label></div>
+            <div class="option-group"><input type="checkbox" id="mc-exudate"><label for="mc-exudate">มีจุดหนองหรือแผ่นขาวที่ทอนซิล (Tonsillar exudate)</label></div>
+        </section>
+
+        <hr>
+
+        <!-- ส่วนที่ 4: Viral Screening (ATK) -->
+        <section>
+            <h2>4. ผลการตรวจ ATK (ถ้ามี)</h2>
+            <div class="grid-2col">
+                <div class="option-group"><input type="checkbox" id="atk-covid"><label for="atk-covid">COVID (ติดเชื้อ)</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-flu-a"><label for="atk-flu-a">ไข้หวัดใหญ่ Flu A (ติดเชื้อ)</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-flu-b"><label for="atk-flu-b">ไข้หวัดใหญ่ Flu B (ติดเชื้อ)</label></div>
+                <div class="option-group"><input type="checkbox" id="atk-negative"><label for="atk-negative">ไม่พบเชื้อ (Negative ทั้งหมด)</label></div>
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- ส่วนที่ 5: Andrographis Checklist -->
+        <section>
+            <h2>5. เช็กลิสต์ความปลอดภัยก่อนใช้ยาฟ้าทะลายโจร</h2>
+            <div class="option-group"><input type="checkbox" id="andro-age"><label for="andro-age">อายุ 12 ปีขึ้นไป</label></div>
+            <div class="option-group"><input type="checkbox" id="andro-pregnant"><label for="andro-pregnant">กำลังตั้งครรภ์ หรือ ให้นมบุตร</label></div>
+            <div class="option-group"><input type="checkbox" id="andro-allergy"><label for="andro-allergy">เคยมีประวัติแพ้ฟ้าทะลายโจร</label></div>
+            <div class="option-group"><input type="checkbox" id="andro-organ"><label for="andro-organ">มีโรคตับ หรือ โรคไตรุนแรง</label></div>
+            <div class="option-group"><input type="checkbox" id="andro-anticoagulant"><label for="andro-anticoagulant">กำลังใช้ยาละลายลิ่มเลือด (Anticoagulant)</label></div>
+            <div class="option-group"><input type="checkbox" id="andro-antiplatelet"><label for="andro-antiplatelet">กำลังใช้ยาต้านเกล็ดเลือด (Antiplatelet)</label></div>
+            <div class="option-group"><input type="checkbox" id="andro-interaction"><label for="andro-interaction">กำลังใช้ยาความดัน หรือ ยาอื่นที่มีปฏิกิริยาร่วม</label></div>
+        </section>
+
+        <button type="button" class="btn-submit" onclick="submitData()">ส่งข้อมูลให้เภสัชกร</button>
+    </div>
+
+    <!-- Structure ของ Modal Popup -->
+    <div class="modal-overlay" id="resultModal">
+        <div class="modal-box">
+            <div class="score-badge" id="modalScore">คะแนน McIsaac: 0 คะแนน</div>
+            <div class="modal-title" id="modalTitle">ผลการประเมินเบื้องต้น</div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="warning-box" id="modalWarning" style="display: none;"></div>
+            <button type="button" class="btn-close" onclick="closeModal()">ตกลง</button>
+        </div>
+    </div>
+
+    <script>
+        function submitData() {
+            const ageInput = document.getElementById('patient-age').value;
+            const age = parseInt(ageInput);
+
+            if (isNaN(age) || age < 0) {
+                alert('กรุณากรอกอายุให้ถูกต้อง');
+                return;
+            }
+
+            const isFever = document.getElementById('mc-fever').checked;
+            const isNoCough = document.getElementById('mc-no-cough').checked;
+            const isTenderNodes = document.getElementById('mc-tender-nodes').checked;
+            const isExudate = document.getElementById('mc-exudate').checked;
+
+            const selectedThroat = document.querySelector('input[name="throat"]:checked')?.value;
+            const isThroatPusOrSpot = (selectedThroat === 'red_white_spots' || selectedThroat === 'pus');
+
+            let score = 0;
+            if (isFever) score += 1;
+            if (isNoCough) score += 1;
+            if (isTenderNodes) score += 1;
+            if (isExudate || isThroatPusOrSpot) score += 1;
+
+            if (age >= 3 && age <= 14) {
+                score += 1;
+            } else if (age >= 45) {
+                score -= 1;
+            }
+
+            if (score < 0) score = 0;
+
+            let title = "";
+            let bodyHTML = "";
+
+            if (score <= 1) {
+                title = "ความเสี่ยงติดเชื้อแบคทีเรียต่ำ (< 10%)";
+                bodyHTML = "• โอกาสติดเชื้อไวรัสสูง แนะนำการรักษาตามอาการ เช่น จิบน้ิำอุ่น พักผ่อนให้เพียงพอ<br>• อาจพิจารณาใช้ยาฟ้าทะลายโจร (หากไม่มีข้อห้ามใช้)";
+            } else if (score === 2 || score === 3) {
+                title = "ความเสี่ยงติดเชื้อแบคทีเรียปานกลาง (15 - 32%)";
+                bodyHTML = "• แนะนำให้ส่งข้อมูลตรวจเพิ่มเติม หรือปรึกษาเภสัชกร/แพทย์ก่อนใช้ยาปฏิชีวนะ (ยาฆ่าเชื้อ)<br>• ตรวจสอบผล ATK ร่วมด้วยเพื่อตัดสาเหตุจาก COVID-19 / ไข้หวัดใหญ่";
+            } else {
+                title = "ความเสี่ยงติดเชื้อแบคทีเรียสูง (> 50%)";
+                bodyHTML = "• มีโอกาสติดเชื้อแบคทีเรียสูง ควรพบแพทย์หรือเภสัชกรเพื่อพิจารณารับยาปฏิชีวนะ (Antibiotics)";
+            }
+
+            // เช็คการแจ้งเตือนฟ้าทะลายโจร
+            const isPregnant = document.getElementById('andro-pregnant').checked;
+            const isAllergy = document.getElementById('andro-allergy').checked;
+            const isOrganDisease = document.getElementById('andro-organ').checked;
+            const isAnticoagulant = document.getElementById('andro-anticoagulant').checked;
+            const isAntiplatelet = document.getElementById('andro-antiplatelet').checked;
+
+            const warningElement = document.getElementById('modalWarning');
+            if (isPregnant || isAllergy || isOrganDisease || isAnticoagulant || isAntiplatelet) {
+                warningElement.innerHTML = "⚠️ <strong>คำเตือนความปลอดภัย:</strong><br>พบข้อห้ามใช้ยาฟ้าทะลายโจร (เช่น ตั้งครรภ์/แพ้ยา/โรคตับไต/ใช้ยาต้านเกล็ดเลือด-ละลายลิ่มเลือด) <strong>ห้ามรับประทานยาฟ้าทะลายโจรโดยเด็ดขาด!</strong>";
+                warningElement.style.display = "block";
+            } else {
+                warningElement.style.display = "none";
+            }
+
+            // ใส่ข้อมูลลง Modal
+            document.getElementById('modalScore').innerText = `คะแนน McIsaac Score: ${score} คะแนน`;
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = bodyHTML;
+
+            // แสดง Modal
+            document.getElementById('resultModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+    </script>
+</body>
 </html>
